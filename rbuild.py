@@ -10,6 +10,7 @@ import sys
 def binary_exists(path):
     return os.path.exists(path) or subprocess.call(['which', path], stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
 
+
 # Attempt to automatically set the path based on the operating system
 # If this doesn't work, modify the variables for your OS to the correct location.
 if os.name == "posix":
@@ -20,15 +21,16 @@ if os.name == "posix":
     else:  # Assume Linux if not macOS
         print("Operating System: Linux")
         PATH_TO_OPENSCAD = '/usr/bin/openscad'
-        
+
         if binary_exists(PATH_TO_OPENSCAD):
             print(f"Binary found at {PATH_TO_OPENSCAD}")
         else:
             print(f"Binary not found at {PATH_TO_OPENSCAD}")
 
         POSSIBLE_PATH_LOCATIONS_FOR_OPENSCAD_NIGHTLY = [
-            '/snap/bin/openscad-nightly', #Path when installed using the snap tooling
-            '/usr/bin/openscad-nightly' #Path when installed using apt (also used in dockerfile)
+            '/snap/bin/openscad-nightly',  # Path when installed using the snap tooling
+            # Path when installed using apt (also used in dockerfile)
+            '/usr/bin/openscad-nightly'
         ]
 
         PATH_TO_OPENSCAD_NIGHTLY = ''
@@ -43,7 +45,7 @@ if os.name == "posix":
 elif os.name == "nt":  # Windows
     print("Operating System: Windows")
     PATH_TO_OPENSCAD = r'C:\Program Files\OpenSCAD\openscad.exe'
-    
+
     if binary_exists(PATH_TO_OPENSCAD):
         print(f"Binary found at {PATH_TO_OPENSCAD}")
     else:
@@ -59,6 +61,7 @@ class BuildSizeConfig:
     NANO = 'nano'
     MINI = 'mini'
     MICRO = 'micro'
+    STEVEN = 'steven'
 
 
 FILE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -98,6 +101,7 @@ MOUNT_ANIMATIONS = [
     ('angle-bracket', 32)
 ]
 
+
 def main():
     if not assertOpenscadExists():
         print(
@@ -120,7 +124,8 @@ def main():
     parser.add_argument(
         '-c',
         default=BuildSizeConfig.MICRO,
-        choices=[BuildSizeConfig.NANO, BuildSizeConfig.MINI, BuildSizeConfig.MICRO],
+        choices=[BuildSizeConfig.NANO, BuildSizeConfig.MINI,
+                 BuildSizeConfig.MICRO, BuildSizeConfig.STEVEN],
         help='Build size config profile. This will determine the size of the rack you wish to generate. '
              'For actual dimensions, please see profiles.scad.'
     )
@@ -176,14 +181,16 @@ def run_build(args):
     else:
         final_target_directory_name = config_var
 
-    rackBuildDirFull = os.path.join(BUILD_PARENT_DIR, final_target_directory_name, RACK_BUILD_TARGET_SUB_DIR)
+    rackBuildDirFull = os.path.join(
+        BUILD_PARENT_DIR, final_target_directory_name, RACK_BUILD_TARGET_SUB_DIR)
 
     if not os.path.exists(rackBuildDirFull):
         os.makedirs(rackBuildDirFull)
 
     if build_var == 'all':
         for dir_file in os.listdir(RACK_BUILD_DIR):
-            build_single(RACK_BUILD_DIR, rackBuildDirFull, dir_file, config_var, dz, nightly)
+            build_single(RACK_BUILD_DIR, rackBuildDirFull,
+                         dir_file, config_var, dz, nightly)
 
         return
 
@@ -194,16 +201,20 @@ def run_build(args):
         return
 
     if filename_rack:
-        build_single(RACK_BUILD_DIR, rackBuildDirFull, filename_rack, config_var, dz, nightly)
+        build_single(RACK_BUILD_DIR, rackBuildDirFull,
+                     filename_rack, config_var, dz, nightly)
+
 
 def build_single(build_dir, target_dir, filename, config, dz, nightly):
     print('Building:', filename, 'from', build_dir, 'to', target_dir)
-    openscad_args = construct_openscad_args(build_dir, target_dir, filename, config, dz)
+    openscad_args = construct_openscad_args(
+        build_dir, target_dir, filename, config, dz)
     run_openscad(openscad_args, nightly)
 
 
 def build_assembly_gifs(config, dz, nightly):
-    print('Building assembly-gifs. Source Dir:', ASSEMBLY_GIF_DIR, '| Target:', ASSEMBLY_GIF_BUILD_DIR)
+    print('Building assembly-gifs. Source Dir:',
+          ASSEMBLY_GIF_DIR, '| Target:', ASSEMBLY_GIF_BUILD_DIR)
 
     if not os.path.exists(ASSEMBLY_GIF_TEMP_DIR):
         os.makedirs(ASSEMBLY_GIF_TEMP_DIR)
@@ -214,7 +225,9 @@ def build_assembly_gifs(config, dz, nightly):
             ASSEMBLY_GIF_DIR, ASSEMBLY_GIF_TEMP_DIR, fileName, config, dz, numSteps
         )
         run_openscad(openscad_args, nightly)
-        build_gif_from_png(fileName, ASSEMBLY_GIF_TEMP_DIR, ASSEMBLY_GIF_BUILD_DIR)
+        build_gif_from_png(fileName, ASSEMBLY_GIF_TEMP_DIR,
+                           ASSEMBLY_GIF_BUILD_DIR)
+
 
 def build_rack_mount_gifs(config, nightly):
     print('Building GIFs for rack-mounts systems')
@@ -227,9 +240,11 @@ def build_rack_mount_gifs(config, nightly):
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
 
-        openscad_args = construct_openscad_animation_args(system_dir, temp_dir, 'animate.scad', config, 10, numSteps)
+        openscad_args = construct_openscad_animation_args(
+            system_dir, temp_dir, 'animate.scad', config, 10, numSteps)
         run_openscad(openscad_args, nightly)
         build_gif_from_png('animate', temp_dir, system_dir)
+
 
 def build_gif_from_png(fileName, source, target):
 
@@ -300,13 +315,15 @@ def find_scad_file(directory, filename):
 
 def run_openscad(options, nightly):
     if nightly:
-        command = [PATH_TO_OPENSCAD_NIGHTLY, '--enable', 'fast-csg', '--enable', 'manifold']
+        command = [PATH_TO_OPENSCAD_NIGHTLY, '--enable',
+                   'fast-csg', '--enable', 'manifold']
     else:
         command = [PATH_TO_OPENSCAD]
 
     command += options
     try:
-        subprocess.check_output(command, universal_newlines=True, stderr=subprocess.DEVNULL)
+        subprocess.check_output(
+            command, universal_newlines=True, stderr=subprocess.DEVNULL)
 
     except FileNotFoundError:
         print('OpenSCAD command not found! '
