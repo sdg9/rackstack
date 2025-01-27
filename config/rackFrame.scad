@@ -38,10 +38,15 @@ _profileConfigs = [
       ["maxUnitDepth", 205],
       ["numRailScrews", 16]
     ]],
+    ["small", [
+      ["maxUnitWidth", 255],
+      ["maxUnitDepth", 255],
+      ["numRailScrews", 36]
+    ]],
     ["steven", [
-      ["maxUnitWidth", 260],
-      ["maxUnitDepth", 260],
-      ["numRailScrews", 20]
+      ["maxUnitWidth", 255],
+      ["maxUnitDepth", 255],
+      ["numRailScrews", 36]
     ]]
   ];
 

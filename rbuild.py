@@ -62,6 +62,7 @@ class BuildSizeConfig:
     MINI = 'mini'
     MICRO = 'micro'
     STEVEN = 'steven'
+    SMALL = 'small'
 
 
 FILE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -125,7 +126,7 @@ def main():
         '-c',
         default=BuildSizeConfig.MICRO,
         choices=[BuildSizeConfig.NANO, BuildSizeConfig.MINI,
-                 BuildSizeConfig.MICRO, BuildSizeConfig.STEVEN],
+                 BuildSizeConfig.MICRO, BuildSizeConfig.STEVEN, BuildSizeConfig.SMALL],
         help='Build size config profile. This will determine the size of the rack you wish to generate. '
              'For actual dimensions, please see profiles.scad.'
     )
