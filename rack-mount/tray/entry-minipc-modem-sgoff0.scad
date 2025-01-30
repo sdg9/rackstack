@@ -36,13 +36,12 @@ mountPointElevation = 1, // basically standoff height
 // add/config standoff coordinates here. Format is [[x,y]]
 mountPoints = [
     // mount 1 - from facing the rack
-    [51,21], // Front Left
-    //[5+75,10], // Front Right
-    [51,21+84], // Back Left
+    [5+20,44],
+    [5+20+49,44], 
     
-    // Other
-    [128+60,17], // Back Right
-    [128+60,17+85.5], // Back Right
+    // Mount 2
+    [255-10-30,3+24],
+    [255-10-30-68,3+24],
     
     // add another mount?
 ]
@@ -68,4 +67,13 @@ mountPoints = [
   );
 }
 
-traySystem();
+difference(){    
+        traySystem();
+        // How do I round the corners and put slits for airflow appropriately on the tray?
+        //translate([10,10,-5]) cube([60, 5, 7]);
+     // Generate slits with rounded edges
+   hull() {
+       translate([10,10,-1]) sphere(4);
+        translate([30,10,-1]) sphere(4);
+   }
+}

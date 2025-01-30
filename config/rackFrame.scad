@@ -14,9 +14,9 @@ _profileConfigs = [
         // $ python3 rbuild.py -b all -c custom
     */
     ["default", [ // Default config. Will be overwritten by any other profiles
-      ["maxUnitWidth", 180],
-      ["maxUnitDepth", 180],
-      ["numRailScrews", 12],
+      ["maxUnitWidth", 255],
+      ["maxUnitDepth", 255],
+      ["numRailScrews", 36],
       ["screwDiff", 10],
       ["mainRailScrewType", "m4"],
       ["mainRailSideMountScrewType", "m4"],
